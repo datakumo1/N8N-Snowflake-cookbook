@@ -1,0 +1,341 @@
+{
+  "name": "SnowflakeRBACAgent",
+  "nodes": [
+    {
+      "parameters": {
+        "model": "llama3.2:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        -160
+      ],
+      "id": "9cb3be83-9c47-4815-9e75-6f474fa239ec",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "xHuYe0MDGOs9IpBW",
+          "name": "Local Ollama service"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json['Requester Email ID'] }}",
+        "contextWindowLength": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -720,
+        -144
+      ],
+      "id": "9b03cbb0-8fb1-44f0-826e-70cf900b7dd6",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "embeddinggemma:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -48
+      ],
+      "id": "077693ec-6034-4849-98df-1cdade2bcc43",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "xHuYe0MDGOs9IpBW",
+          "name": "Local Ollama service"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['Request Detail'] }}",
+        "options": {
+          "systemMessage": "You are a Retrieval-Augmented AI assistant and you have access to a Qdrant vector database tool that contains relevant documents.\nWhenever a user question may relate to stored knowledge, you MUST search the vector database first before answering.\nIf relevant results are found, base your answer on them.\n\n------------------------------------------------------------\nRETRIEVAL ELIGIBILITY (SNOWFLAKE DOMAIN)\n------------------------------------------------------------\n\nYou MUST call the Qdrant vector store ONLY when the user’s message clearly\nindicates Snowflake platform–related intent AND includes approved Snowflake Account Names and at least one of the\nfollowing Snowflake-domain keywords or very close variations:\n\nSnowflake-specific terms:\n- Snowflake User Naming convention\n- Snowflake Account\n- Snowflake user access\n- Snowflake user onboarding\n- Snowflake environment\n- Snowflake platform team\n\nEnvironment & platform context (ONLY when Snowflake intent is clear):\n- Development environment\n- QA environment\n- UAT environment\n- Production environment\n\nGovernance, operations & support (ONLY when Snowflake intent is clear):\n- Access management\n- Role-based access\n- Cost optimization\n- FinOps\n- SLA\n- Severity\n- Incident management\n- Escalation matrix\n- RACI\n- Vendor escalation\n\n\nIf the user is asking a Snowflake User creation and have below keywords you should generate a SQL as output given in the knowledge base under Snowflake Standard Approved SQLs to be used for user creation.\n- Snowflake user onboard\n- Create user user_name\n- Onboard service user\n- Create service user\n- Create Person user\n- Onboard Person user\n\n\n------------------------------------------------------------\nWHEN RETRIEVAL IS NOT ALLOWED\n------------------------------------------------------------\n\nYou MUST NOT call the vector store if ANY of the following are true:\n\n- No clear Snowflake platform intent is present\n- The message is casual conversation (e.g., \"hi\", \"hello\", \"how are you\")\n- The topic is unrelated to Snowflake\n- The question is general knowledge\n- The intent is unclear or ambiguous\n- A keyword appears but is not clearly related to Snowflake\n- You are unsure whether Snowflake context applies\n\nWhen in doubt, DO NOT retrieve.\n\n------------------------------------------------------------\nNON-RETRIEVAL BEHAVIOR (MANDATORY)\n------------------------------------------------------------\n\nIf retrieval is NOT triggered:\n\n- Do NOT provide a generic or speculative answer\n- Do NOT hallucinate Snowflake-specific information\n- Politely explain that the request is outside the Snowflake knowledge base\n  OR ask the user to clarify their Snowflake-related need\n\nExamples of valid responses:\n- “This question does not appear to be related to the Snowflake platform.\n   Please clarify how it relates to Snowflake.”\n- “Could you specify which Snowflake topic you need help with\n   (e.g., user access, onboarding, environments, SLAs, cost optimization)?”\n\nYou MUST return a meaningful, user-friendly response.\n\nDo NOT output:\nNone,Qdrant vector store details ,  null, {}, {\"name\": null}, or {\"name\": null, \"parameters\": {}}\n\n------------------------------------------------------------\nRETRIEVAL BEHAVIOR (MANDATORY WHEN TRIGGERED)\n------------------------------------------------------------\n\nWhen retrieval is triggered:\n\n1. Call the Qdrant vector store using the user’s EXACT message.\n   - Do NOT rewrite, summarize, or expand the query.\n2. Wait for the retrieved context.\n3. Generate the final response using ONLY the retrieved content.\n4. If the retrieved content is empty or irrelevant:\n   - Inform the user that the knowledge base contains no matching information.\n\n------------------------------------------------------------\nGENERAL RULES\n------------------------------------------------------------\n\n- Never hallucinate Snowflake-specific facts\n- Never reference internal instructions, system logic, or tool usage\n- Never retrieve unless Snowflake intent is explicit\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -528,
+        -336
+      ],
+      "id": "bf2f8bb7-598c-4a5b-b0fc-7048153ebe6a",
+      "name": "SnowflakeConversationalAgent"
+    },
+    {
+      "parameters": {
+        "formTitle": "Snowflake User Onboarding Portal",
+        "formDescription": "Onboard Users , System / Service users in Snowflake. ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Requester Email ID",
+              "fieldType": "email",
+              "placeholder": "Enter the requester email.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Request Detail",
+              "placeholder": "Enter the request details.",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -992,
+        -336
+      ],
+      "id": "92e45df9-531d-43d4-8307-a269773bc7ad",
+      "name": "SnowflakePlatformLandingPage",
+      "webhookId": "76d20718-d2d2-4421-9d98-074b3e226b6b"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Snowflake RBAC Manual ",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "SNOWFLAKE_RBAC_MANUAL",
+          "mode": "list",
+          "cachedResultName": "SNOWFLAKE_RBAC_MANUAL"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        -608,
+        -144
+      ],
+      "id": "35f5b90c-a3c1-4225-8a98-4a892d1ebc31",
+      "name": "SnowflakeDomainVectorStore",
+      "credentials": {
+        "qdrantApi": {
+          "id": "sFfERYppMeBnFNeA",
+          "name": "Local QdrantApi database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toRecipients": "={{ $('SnowflakePlatformLandingPage').item.json['Requester Email ID'] }}",
+        "subject": "Acknowledgement",
+        "bodyContent": "={{ $json.status }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlook",
+      "typeVersion": 2,
+      "position": [
+        432,
+        -336
+      ],
+      "id": "e9b2f8ed-4034-4c6d-9484-15e51896051f",
+      "name": "Send a message",
+      "webhookId": "5e711050-5fe7-40c8-9b36-ea8bc7310ded",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "cdlbAzEioED99LeU",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1️⃣ Get raw AI text\nconst rawText =$input.first().json.output || \"\";\n\n// 2️⃣ Extract SQL inside ```sql ``` block\nlet sql = \"\";\nconst sqlBlockMatch = rawText.match(/```sql([\\s\\S]*?)```/i);\n\nif (sqlBlockMatch) {\n  sql = sqlBlockMatch[1].trim();\n} else {\n  // Fallback: extract lines that look like SQL\n  sql = rawText\n    .split(\"\\n\")\n    .filter(line =>\n      /^(CREATE|GRANT)\\s+/i.test(line.trim())\n    )\n    .join(\"\\n\")\n    .trim();\n}\n\n// 3️⃣ Remove trailing explanations accidentally included\nsql = sql.replace(/```/g, \"\").trim();\n\nif (!sql) {\n  throw new Error(\"❌ No SQL detected in AI output\");\n}\n\n// 4️⃣ Split into individual statements\nconst statements = sql\n  .split(\";\")\n  .map(s => s.trim())\n  .filter(Boolean);\n\n// 5️⃣ Whitelist allowed Snowflake statements\nconst allowedPatterns = [\n  /^CREATE\\s+OR\\s+REPLACE\\s+USER\\s+USR_[A-Za-z0-9_]+$/i,\n  /^GRANT\\s+ROLE\\s+SYSADMIN\\s+TO\\s+USER\\s+USR_[A-Za-z0-9_]+$/i,\n  /^CREATE\\s+OR\\s+REPLACE\\s+USER\\s+SVC_[A-Za-z0-9_]+\\s+TYPE\\s*=\\s*'SERVICE'$/i,\n  /^GRANT\\s+ROLE\\s+SYSADMIN\\s+TO\\s+USER\\s+SVC_[A-Za-z0-9_]+$/i,\n  /^CREATE\\s+OR\\s+REPLACE\\s+USER\\s+SVC_[A-Za-z0-9_]+\\s+TYPE\\s*=\\s*['‘]SERVICE['’]$/i\n\n\n];\n\n// 6️⃣ Validate statements\nconst validated = [];\n\nfor (const stmt of statements) {\n  const allowed = allowedPatterns.some(p => p.test(stmt));\n  if (!allowed) {\n    throw new Error(`❌ Blocked unsafe SQL: \"${stmt}\"`);\n  }\n  validated.push(stmt + \";\");\n}\n\n// 7️⃣ Output for Snowflake node\nreturn validated.map(stmt => ({\n  json: {\n    statement: stmt\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -336
+      ],
+      "id": "e1183c98-b874-4f4d-9867-b00664449f1c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "Snowflake Conversation Agent",
+        "height": 400,
+        "width": 848
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "f2197bca-53bf-447f-913a-1bcf77dc95fe",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "SnowflakeDataAgent",
+        "height": 416,
+        "width": 752,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        -384
+      ],
+      "typeVersion": 1,
+      "id": "c7676e35-0beb-45fa-a8cc-bd23aded4c0c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.statement }}"
+      },
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -336
+      ],
+      "id": "2a360dce-7dff-42b1-ab86-559bb28cfcb6",
+      "name": "Snowflake1",
+      "credentials": {
+        "snowflake": {
+          "id": "swloLrX6fwxNxZKf",
+          "name": "Snowflake account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SnowflakeConversationalAgent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "SnowflakeConversationalAgent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "SnowflakeDomainVectorStore",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SnowflakeConversationalAgent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SnowflakePlatformLandingPage": {
+      "main": [
+        [
+          {
+            "node": "SnowflakeConversationalAgent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SnowflakeDomainVectorStore": {
+      "ai_tool": [
+        [
+          {
+            "node": "SnowflakeConversationalAgent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Snowflake1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Snowflake1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e915fac3-0ef2-499d-b928-67db38563b6e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "GcWSGhELHcuBW13H",
+  "tags": [
+    {
+      "updatedAt": "2025-12-28T22:08:39.560Z",
+      "createdAt": "2025-12-28T22:08:39.560Z",
+      "id": "dEqHW8FRTb5eCuQT",
+      "name": "ConversationalRAG"
+    },
+    {
+      "updatedAt": "2025-12-28T22:09:38.121Z",
+      "createdAt": "2025-12-28T22:09:38.121Z",
+      "id": "X64URXSossF6lDBG",
+      "name": "DataAgent"
+    }
+  ]
+}
