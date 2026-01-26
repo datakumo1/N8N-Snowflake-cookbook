@@ -1,7 +1,7 @@
 # N8N Snowflake Agentic AI Workflows
-<img width="200" height="180" alt="image" src="https://github.com/user-attachments/assets/b8918944-5069-4bd4-8d38-47df1b298a26" />
+<img width="180" height="180" alt="image" src="https://github.com/user-attachments/assets/b8918944-5069-4bd4-8d38-47df1b298a26" />
 <img width="200" height="142" alt="image" src="https://github.com/user-attachments/assets/e0e933b7-14cf-4b46-a5a2-700877a73335" />
-<img width="225" height="150" alt="image" src="https://github.com/user-attachments/assets/005522c4-f02e-43c5-bfc8-e13e332bb9f1" />
+<img width="225" height="190" alt="image" src="https://github.com/user-attachments/assets/005522c4-f02e-43c5-bfc8-e13e332bb9f1" />
 <img width="200" height="116" alt="image" src="https://github.com/user-attachments/assets/ba27e261-c6f5-4936-9f34-669c9a90eb17" />
 
 
