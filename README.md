@@ -15,19 +15,21 @@ The goal of this project is to demonstrate how **Agentic AI patterns** can be ap
 ## What Is Agentic AI?
 
 Agentic AI refers to systems where AI agents can:
-
 * Reason and plan tasks
 * Interact with tools and APIs
 * Maintain memory and context
 * Take autonomous actions based on goals and events
 
-In this repository, AI agents are used to **observe Snowflake events**, **reason over metadata and data**, and **take actions** such as running queries, validating data, optimizing operations, and generating insights.
+This repo has ready to run N8N workflows that orchestrates AI agents that are used to **observe Snowflake events**, **reason over metadata and data**, and **take actions** such as running queries, validating data, optimizing operations, and generating insights.
 
 ---
 
 ## Architecture
 
 The solution is built on the **n8n Agentic AI Starter Kit** and includes the following core components:
+
+
+
 
 ### 1. n8n (Workflow Orchestration)
 
