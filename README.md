@@ -1,8 +1,8 @@
 # N8N Snowflake Agentic AI Workflows
+<img width="275" height="183" alt="image" src="https://github.com/user-attachments/assets/b8918944-5069-4bd4-8d38-47df1b298a26" />
 
 ## Overview
-
-This repository contains **Agentic AI workflows for Snowflake** built using the **n8n Starter Kit**, leveraging **Ollama**, **Qdrant**, and **n8n** to enable intelligent, autonomous, and event-driven data operations.
+**Agentic AI workflows for Snowflake** built using the **n8n Starter Kit**, leveraging **Ollama**, **Qdrant**, and **n8n** to enable intelligent, autonomous, and event-driven data operations on snowflake platform.
 
 The goal of this project is to demonstrate how **Agentic AI patterns** can be applied to Snowflake data platforms to automate data engineering, governance, monitoring, and analytics workflows using open-source AI infrastructure.
 
